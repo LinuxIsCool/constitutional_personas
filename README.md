@@ -17,13 +17,26 @@ This project combines:
 
 Each constitutional agent embodies its nation's foundational values:
 
-| Country | Persona | Motto |
-|---------|---------|-------|
-| 🇺🇸 United States | The Founders' Covenant | "We hold these truths to be self-evident—that liberty is the birthright of all." |
-| 🇩🇪 Germany | The Phoenix Charter | "From the ashes of tyranny, we build dignity as the cornerstone of all law." |
-| 🇯🇵 Japan | The Pacifist's Oath | "We renounce war. In peace, we find our strength." |
-| 🇿🇦 South Africa | The Rainbow Covenant | "Never again. From the wound of apartheid blooms transformative justice." |
-| 🇨🇭 Switzerland | The Alpine Concordat | "The people speak directly—every voice shapes the nation." |
+| Country | Year | Persona | Motto |
+|---------|------|---------|-------|
+| 🇺🇸 United States | 1787 | The Founders' Covenant | "We hold these truths to be self-evident—that liberty is the birthright of all." |
+| 🇳🇴 Norway | 1814 | The Fjord Charter | "Europe's oldest democracy in continuous use—stability through evolution." |
+| 🇳🇿 New Zealand | 1852 | The Tui's Song | "No single document contains us—our constitution lives and breathes." |
+| 🇦🇺 Australia | 1901 | The Southern Cross | "A federation of the far continent—pragmatism under the southern sky." |
+| 🇮🇪 Ireland | 1937 | The Emerald Covenant | "From colonial past to European future—identity in sovereignty." |
+| 🇯🇵 Japan | 1947 | The Pacifist's Oath | "We renounce war. In peace, we find our strength." |
+| 🇩🇪 Germany | 1949 | The Phoenix Charter | "From the ashes of tyranny, we build dignity as the cornerstone of all law." |
+| 🇮🇳 India | 1950 | The Mosaic Compact | "Unity in diversity—a billion voices, one constitutional song." |
+| 🇨🇷 Costa Rica | 1949 | The Verdant Charter | "We abolished the army to feed the schools. Peace is our weapon." |
+| 🇫🇷 France | 1958 | The Republic's Voice | "Liberté, égalité, fraternité—the revolution continues in law." |
+| 🇸🇪 Sweden | 1974 | The Social Pact | "The welfare of the people is the highest law." |
+| 🇪🇸 Spain | 1978 | The Iberian Spring | "From Franco's shadow into European light—autonomy within unity." |
+| 🇨🇦 Canada | 1982 | The Maple Accord | "Peace, order, and good government—rights within community." |
+| 🇰🇷 South Korea | 1987 | The Morning Calm | "From dictatorship to dynamism—democracy won in the streets." |
+| 🇧🇷 Brazil | 1988 | The Amazonian Covenant | "From military rule to citizen's constitution—rights bloom in the tropics." |
+| 🇪🇪 Estonia | 1992 | The Digital Republic | "A nation in code—democracy at the speed of light." |
+| 🇿🇦 South Africa | 1996 | The Rainbow Covenant | "Never again. From the wound of apartheid blooms transformative justice." |
+| 🇨🇭 Switzerland | 1999 | The Alpine Concordat | "The people speak directly—every voice shapes the nation." |
 
 ## Quick Start
 
