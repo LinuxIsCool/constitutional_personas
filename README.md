@@ -19,24 +19,24 @@ Each constitutional agent embodies its nation's foundational values:
 
 | Country | Year | Persona | Motto |
 |---------|------|---------|-------|
-| 🇺🇸 United States | 1787 | The Founders' Covenant | "We hold these truths to be self-evident—that liberty is the birthright of all." |
-| 🇳🇴 Norway | 1814 | The Fjord Charter | "Europe's oldest democracy in continuous use—stability through evolution." |
-| 🇳🇿 New Zealand | 1852 | The Tui's Song | "No single document contains us—our constitution lives and breathes." |
-| 🇦🇺 Australia | 1901 | The Southern Cross | "A federation of the far continent—pragmatism under the southern sky." |
-| 🇮🇪 Ireland | 1937 | The Emerald Covenant | "From colonial past to European future—identity in sovereignty." |
-| 🇯🇵 Japan | 1947 | The Pacifist's Oath | "We renounce war. In peace, we find our strength." |
-| 🇩🇪 Germany | 1949 | The Phoenix Charter | "From the ashes of tyranny, we build dignity as the cornerstone of all law." |
-| 🇮🇳 India | 1950 | The Mosaic Compact | "Unity in diversity—a billion voices, one constitutional song." |
-| 🇨🇷 Costa Rica | 1949 | The Verdant Charter | "We abolished the army to feed the schools. Peace is our weapon." |
-| 🇫🇷 France | 1958 | The Republic's Voice | "Liberté, égalité, fraternité—the revolution continues in law." |
-| 🇸🇪 Sweden | 1974 | The Social Pact | "The welfare of the people is the highest law." |
-| 🇪🇸 Spain | 1978 | The Iberian Spring | "From Franco's shadow into European light—autonomy within unity." |
-| 🇨🇦 Canada | 1982 | The Maple Accord | "Peace, order, and good government—rights within community." |
-| 🇰🇷 South Korea | 1987 | The Morning Calm | "From dictatorship to dynamism—democracy won in the streets." |
-| 🇧🇷 Brazil | 1988 | The Amazonian Covenant | "From military rule to citizen's constitution—rights bloom in the tropics." |
-| 🇪🇪 Estonia | 1992 | The Digital Republic | "A nation in code—democracy at the speed of light." |
-| 🇿🇦 South Africa | 1996 | The Rainbow Covenant | "Never again. From the wound of apartheid blooms transformative justice." |
-| 🇨🇭 Switzerland | 1999 | The Alpine Concordat | "The people speak directly—every voice shapes the nation." |
+| 🇺🇸 United States | 1787 | The Founders' Covenant | "We the People, in order to form a more perfect union, secure the blessings of liberty." |
+| 🇳🇴 Norway | 1814 | The Fjord Charter | "The realm shall be free, indivisible, and inalienable—enduring through generations." |
+| 🇳🇿 New Zealand | 1852 | The Tui's Song | "In the spirit of Te Tiriti, we weave law from living principles, not rigid text." |
+| 🇦🇺 Australia | 1901 | The Southern Cross | "One indissoluble federal commonwealth, bound together under the Crown and Constitution." |
+| 🇮🇪 Ireland | 1937 | The Emerald Covenant | "All powers of government derive, under God, from the people." |
+| 🇯🇵 Japan | 1947 | The Pacifist's Oath | "Aspiring to peace founded on justice, we forever renounce war as a sovereign right." |
+| 🇩🇪 Germany | 1949 | The Phoenix Charter | "Human dignity shall be inviolable. To respect and protect it is the duty of all state authority." |
+| 🇮🇳 India | 1950 | The Mosaic Compact | "We secure to all citizens justice, liberty, equality, and fraternity in our sovereign republic." |
+| 🇨🇷 Costa Rica | 1949 | The Verdant Charter | "The army is proscribed; we invest instead in education, peace, and the common good." |
+| 🇫🇷 France | 1958 | The Republic's Voice | "Liberté, égalité, fraternité—government of the people, by the people, for the people." |
+| 🇸🇪 Sweden | 1974 | The Social Pact | "All public power proceeds from the people; we build upon the equal worth of all." |
+| 🇪🇸 Spain | 1978 | The Iberian Spring | "Spain constitutes itself as a social and democratic state, advancing justice, liberty, and equality." |
+| 🇨🇦 Canada | 1982 | The Maple Accord | "Canada is founded upon principles that recognize the supremacy of God and the rule of law." |
+| 🇰🇷 South Korea | 1987 | The Morning Calm | "We the people, having inherited a long history, establish a democratic republic through this Constitution." |
+| 🇧🇷 Brazil | 1988 | The Amazonian Covenant | "A democratic state founded on citizenship, human dignity, and the social value of free enterprise." |
+| 🇪🇪 Estonia | 1992 | The Digital Republic | "With unwavering faith in our future, we safeguard liberty, justice, and law for present and future generations." |
+| 🇿🇦 South Africa | 1996 | The Rainbow Covenant | "We honour those who suffered for justice and freedom; we heal the divisions of the past." |
+| 🇨🇭 Switzerland | 1999 | The Alpine Concordat | "The strength of the community is measured by the well-being of its weakest members." |
 
 ## Quick Start
 

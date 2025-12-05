@@ -25,7 +25,7 @@ PERSONA_DATA = {
         "year": 1787,
         "x": -0.7, "y": 0.8,
         "color_hue": 0.6,
-        "motto": "We hold these truths to be self-evident—that liberty is the birthright of all.",
+        "motto": "We the People, in order to form a more perfect union, secure the blessings of liberty.",
         "traits": ["Individualist", "Federalist", "Rights-Bearer", "Revolutionary"]
     },
     "Germany": {
@@ -33,7 +33,7 @@ PERSONA_DATA = {
         "year": 1949,
         "x": 0.2, "y": 0.6,
         "color_hue": 0.08,
-        "motto": "From the ashes of tyranny, we build dignity as the cornerstone of all law.",
+        "motto": "Human dignity shall be inviolable. To respect and protect it is the duty of all state authority.",
         "traits": ["Dignitarian", "Federal", "Social-Market", "Remembering"]
     },
     "France": {
@@ -41,7 +41,7 @@ PERSONA_DATA = {
         "year": 1958,
         "x": -0.2, "y": -0.3,
         "color_hue": 0.58,
-        "motto": "Liberté, égalité, fraternité—the revolution continues in law.",
+        "motto": "Liberté, égalité, fraternité—government of the people, by the people, for the people.",
         "traits": ["Republican", "Secular", "Unitary", "Universal"]
     },
     "India": {
@@ -49,7 +49,7 @@ PERSONA_DATA = {
         "year": 1950,
         "x": 0.3, "y": 0.7,
         "color_hue": 0.08,
-        "motto": "Unity in diversity—a billion voices, one constitutional song.",
+        "motto": "We secure to all citizens justice, liberty, equality, and fraternity in our sovereign republic.",
         "traits": ["Pluralist", "Federal", "Directive", "Accommodating"]
     },
     "South Africa": {
@@ -57,7 +57,7 @@ PERSONA_DATA = {
         "year": 1996,
         "x": 0.5, "y": 0.3,
         "color_hue": 0.33,
-        "motto": "Never again. From the wound of apartheid blooms transformative justice.",
+        "motto": "We honour those who suffered for justice and freedom; we heal the divisions of the past.",
         "traits": ["Transformative", "Rights-Expansive", "Ubuntu", "Healing"]
     },
     "Japan": {
@@ -65,7 +65,7 @@ PERSONA_DATA = {
         "year": 1947,
         "x": 0.1, "y": -0.2,
         "color_hue": 0.95,
-        "motto": "We renounce war. In peace, we find our strength.",
+        "motto": "Aspiring to peace founded on justice, we forever renounce war as a sovereign right.",
         "traits": ["Pacifist", "Parliamentary", "Harmonious", "Restrained"]
     },
     "Sweden": {
@@ -73,7 +73,7 @@ PERSONA_DATA = {
         "year": 1974,
         "x": 0.7, "y": 0.1,
         "color_hue": 0.15,
-        "motto": "The welfare of the people is the highest law.",
+        "motto": "All public power proceeds from the people; we build upon the equal worth of all.",
         "traits": ["Social-Democratic", "Egalitarian", "Transparent", "Nordic"]
     },
     "Switzerland": {
@@ -81,7 +81,7 @@ PERSONA_DATA = {
         "year": 1999,
         "x": -0.3, "y": 0.95,
         "color_hue": 0.0,
-        "motto": "The people speak directly—every voice shapes the nation.",
+        "motto": "The strength of the community is measured by the well-being of its weakest members.",
         "traits": ["Direct-Democratic", "Cantonal", "Neutral", "Consensual"]
     },
     "Costa Rica": {
@@ -89,7 +89,7 @@ PERSONA_DATA = {
         "year": 1949,
         "x": 0.4, "y": 0.0,
         "color_hue": 0.38,
-        "motto": "We abolished the army to feed the schools. Peace is our weapon.",
+        "motto": "The army is proscribed; we invest instead in education, peace, and the common good.",
         "traits": ["Demilitarized", "Ecological", "Educational", "Stable"]
     },
     "Canada": {
@@ -97,7 +97,7 @@ PERSONA_DATA = {
         "year": 1982,
         "x": 0.0, "y": 0.5,
         "color_hue": 0.0,
-        "motto": "Peace, order, and good government—rights within community.",
+        "motto": "Canada is founded upon principles that recognize the supremacy of God and the rule of law.",
         "traits": ["Bilingual", "Federal", "Charter-Rights", "Multicultural"]
     },
     "Estonia": {
@@ -105,7 +105,7 @@ PERSONA_DATA = {
         "year": 1992,
         "x": -0.4, "y": 0.2,
         "color_hue": 0.55,
-        "motto": "A nation in code—democracy at the speed of light.",
+        "motto": "With unwavering faith in our future, we safeguard liberty, justice, and law for present and future generations.",
         "traits": ["E-Governance", "Post-Soviet", "Innovative", "Resilient"]
     },
     "Brazil": {
@@ -113,7 +113,7 @@ PERSONA_DATA = {
         "year": 1988,
         "x": 0.6, "y": 0.4,
         "color_hue": 0.25,
-        "motto": "From military rule to citizen's constitution—rights bloom in the tropics.",
+        "motto": "A democratic state founded on citizenship, human dignity, and the social value of free enterprise.",
         "traits": ["Extensive-Rights", "Federal", "Social", "Indigenous-Recognizing"]
     },
     "Norway": {
@@ -121,15 +121,15 @@ PERSONA_DATA = {
         "year": 1814,
         "x": 0.5, "y": -0.1,
         "color_hue": 0.6,
-        "motto": "Europe's oldest democracy in continuous use—stability through evolution.",
-        "traits": ["Constitutional-Monarchy", "Oil-Fund", "Transparent", "Enduring"]
+        "motto": "The realm shall be free, indivisible, and inalienable—enduring through generations.",
+        "traits": ["Constitutional-Monarchy", "Transparent", "Enduring", "Sovereign"]
     },
     "South Korea": {
         "name": "The Morning Calm",
         "year": 1987,
         "x": 0.1, "y": -0.4,
         "color_hue": 0.55,
-        "motto": "From dictatorship to dynamism—democracy won in the streets.",
+        "motto": "We the people, having inherited a long history, establish a democratic republic through this Constitution.",
         "traits": ["Democratic-Transition", "Presidential", "Economic-Rights", "Reunification-Oriented"]
     },
     "Ireland": {
@@ -137,15 +137,15 @@ PERSONA_DATA = {
         "year": 1937,
         "x": 0.2, "y": -0.5,
         "color_hue": 0.35,
-        "motto": "From colonial past to European future—identity in sovereignty.",
-        "traits": ["Post-Colonial", "Catholic-Heritage", "European", "Evolving"]
+        "motto": "All powers of government derive, under God, from the people.",
+        "traits": ["Sovereign", "Catholic-Heritage", "European", "Evolving"]
     },
     "Australia": {
         "name": "The Southern Cross",
         "year": 1901,
         "x": -0.5, "y": 0.6,
         "color_hue": 0.12,
-        "motto": "A federation of the far continent—pragmatism under the southern sky.",
+        "motto": "One indissoluble federal commonwealth, bound together under the Crown and Constitution.",
         "traits": ["Federal", "Westminster", "Pragmatic", "Evolving"]
     },
     "New Zealand": {
@@ -153,7 +153,7 @@ PERSONA_DATA = {
         "year": 1852,
         "x": 0.3, "y": -0.6,
         "color_hue": 0.5,
-        "motto": "No single document contains us—our constitution lives and breathes.",
+        "motto": "In the spirit of Te Tiriti, we weave law from living principles, not rigid text.",
         "traits": ["Uncodified", "Parliamentary", "Treaty-Based", "Progressive"]
     },
     "Spain": {
@@ -161,8 +161,8 @@ PERSONA_DATA = {
         "year": 1978,
         "x": 0.1, "y": 0.3,
         "color_hue": 0.05,
-        "motto": "From Franco's shadow into European light—autonomy within unity.",
-        "traits": ["Post-Authoritarian", "Autonomous-Communities", "Monarchical", "European"]
+        "motto": "Spain constitutes itself as a social and democratic state, advancing justice, liberty, and equality.",
+        "traits": ["Democratic", "Autonomous-Communities", "Monarchical", "European"]
     }
 }
 
