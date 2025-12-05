@@ -1,0 +1,35 @@
+# Constitutional Personas - Requirements
+# ======================================
+
+# Core dependencies (standard library)
+# sqlite3 - included in Python standard library
+# json - included in Python standard library
+# urllib - included in Python standard library
+
+# Visualization dependencies (existing project)
+numpy>=1.21.0
+matplotlib>=3.5.0
+scipy>=1.7.0
+
+# Claude Agent SDK (for production agent integration)
+claude-agent-sdk>=0.1.0
+
+# Optional: For improved async support
+anyio>=3.0.0
+
+# Development dependencies
+# -----------------------
+# pytest>=7.0.0
+# pytest-asyncio>=0.21.0
+
+# Notes:
+# ------
+# 1. Ollama must be installed separately for local embeddings:
+#    - Install: https://ollama.ai/download
+#    - Run: ollama serve
+#    - Pull embedding model: ollama pull nomic-embed-text
+#
+# 2. The Claude Agent SDK requires:
+#    - Python 3.10+
+#    - Claude Code CLI (bundled with SDK)
+#    - ANTHROPIC_API_KEY environment variable

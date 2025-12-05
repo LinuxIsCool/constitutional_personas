@@ -1,0 +1,1081 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Constitutional Fields | Living Democracy</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: #000;
+            overflow: hidden;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        }
+
+        canvas {
+            display: block;
+            position: fixed;
+            top: 0;
+            left: 0;
+        }
+
+        #trail-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            opacity: 0.6;
+        }
+
+        #ui {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        #info-panel {
+            position: absolute;
+            bottom: 30px;
+            left: 30px;
+            background: rgba(5,5,15,0.92);
+            backdrop-filter: blur(30px);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 20px;
+            padding: 28px;
+            max-width: 400px;
+            pointer-events: auto;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 0;
+            transform: translateY(30px) scale(0.95);
+        }
+
+        #info-panel.visible {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        #info-panel h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #fff;
+            letter-spacing: -0.02em;
+        }
+
+        #info-panel .country {
+            font-size: 0.75rem;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        #info-panel .metrics {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .metric {
+            background: rgba(255,255,255,0.03);
+            padding: 14px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.04);
+        }
+
+        .metric-label {
+            font-size: 0.6rem;
+            color: #555;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-weight: 500;
+        }
+
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #fff;
+            margin-top: 4px;
+        }
+
+        .metric-bar {
+            height: 4px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 2px;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+
+        .metric-fill {
+            height: 100%;
+            border-radius: 2px;
+            transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        #info-panel .history {
+            font-size: 0.9rem;
+            color: #999;
+            line-height: 1.7;
+            border-top: 1px solid rgba(255,255,255,0.06);
+            padding-top: 18px;
+            font-weight: 300;
+        }
+
+        #info-panel .crises {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid rgba(255,255,255,0.06);
+        }
+
+        #info-panel .crises-title {
+            font-size: 0.6rem;
+            color: #555;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+
+        .crisis-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+        }
+
+        .crisis-year {
+            font-size: 0.75rem;
+            color: #666;
+            font-weight: 500;
+            min-width: 40px;
+        }
+
+        .crisis-name {
+            font-size: 0.8rem;
+            color: #aaa;
+            flex: 1;
+        }
+
+        .crisis-intensity {
+            width: 40px;
+            height: 4px;
+            background: rgba(255,100,100,0.2);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .crisis-intensity-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff6b6b, #ff4757);
+            border-radius: 2px;
+        }
+
+        #controls {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            pointer-events: auto;
+        }
+
+        .control-btn {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #aaa;
+            padding: 14px 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            letter-spacing: 0.02em;
+        }
+
+        .control-btn:hover {
+            background: rgba(255,255,255,0.12);
+            color: #fff;
+            transform: translateY(-2px);
+        }
+
+        .control-btn.active {
+            background: rgba(255,255,255,0.15);
+            border-color: rgba(255,255,255,0.3);
+            color: #fff;
+        }
+
+        .control-btn.danger {
+            border-color: rgba(255,100,100,0.3);
+        }
+
+        .control-btn.danger:hover {
+            background: rgba(255,100,100,0.2);
+            border-color: rgba(255,100,100,0.5);
+        }
+
+        #legend {
+            position: absolute;
+            top: 30px;
+            left: 30px;
+            font-size: 0.68rem;
+            color: #444;
+            line-height: 2;
+            pointer-events: auto;
+        }
+
+        #legend strong {
+            color: #666;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+        }
+
+        #legend .key {
+            display: inline-block;
+            padding: 2px 8px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 4px;
+            margin-left: 4px;
+            font-family: monospace;
+        }
+
+        #stats {
+            position: absolute;
+            bottom: 30px;
+            right: 30px;
+            font-size: 0.65rem;
+            color: #333;
+            font-family: 'Inter', monospace;
+            text-align: right;
+            line-height: 1.8;
+        }
+
+        #mode-indicator {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3rem;
+            font-weight: 300;
+            color: rgba(255,255,255,0.1);
+            pointer-events: none;
+            transition: all 0.5s ease;
+            opacity: 0;
+        }
+
+        #mode-indicator.visible {
+            opacity: 1;
+        }
+
+        #connection-info {
+            position: absolute;
+            top: 50%;
+            right: 30px;
+            transform: translateY(-50%);
+            font-size: 0.7rem;
+            color: #444;
+            max-width: 200px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        #connection-info.visible {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="trail-canvas"></canvas>
+    <canvas id="canvas"></canvas>
+
+    <div id="ui">
+        <div id="legend">
+            <strong>AXES</strong><br>
+            X: Democracy Index (0→10)<br>
+            Y: Press Freedom Score<br>
+            <br>
+            <strong>PARTICLES</strong><br>
+            Each ≈ 100,000 citizens<br>
+            <br>
+            <strong>CONTROLS</strong><br>
+            <span class="key">Click</span> Attract<br>
+            <span class="key">Right-click</span> Repel<br>
+            <span class="key">Scroll</span> Zoom<br>
+            <span class="key">Shift+Drag</span> Pan<br>
+            <span class="key">V</span> Toggle Voronoi<br>
+            <span class="key">R</span> Reset View<br>
+            <span class="key">Esc</span> Close Panel
+        </div>
+
+        <div id="controls">
+            <button class="control-btn danger" id="btn-chaos">Inject Chaos</button>
+            <button class="control-btn" id="btn-heal">Heal / Stabilize</button>
+            <button class="control-btn" id="btn-liberate">Liberate Particles</button>
+            <button class="control-btn" id="btn-voronoi">Toggle Boundaries</button>
+            <button class="control-btn" id="btn-reset">Reset View</button>
+        </div>
+
+        <div id="info-panel">
+            <h2 id="panel-name"></h2>
+            <div class="country" id="panel-country"></div>
+            <div class="metrics">
+                <div class="metric">
+                    <div class="metric-label">Democracy Index</div>
+                    <div class="metric-value" id="metric-democracy">—</div>
+                    <div class="metric-bar"><div class="metric-fill" id="fill-democracy" style="width: 0%; background: linear-gradient(90deg, #4ecdc4, #44a08d);"></div></div>
+                </div>
+                <div class="metric">
+                    <div class="metric-label">Press Freedom</div>
+                    <div class="metric-value" id="metric-press">—</div>
+                    <div class="metric-bar"><div class="metric-fill" id="fill-press" style="width: 0%; background: linear-gradient(90deg, #ff6b6b, #ee5a24);"></div></div>
+                </div>
+                <div class="metric">
+                    <div class="metric-label">HDI Score</div>
+                    <div class="metric-value" id="metric-hdi">—</div>
+                    <div class="metric-bar"><div class="metric-fill" id="fill-hdi" style="width: 0%; background: linear-gradient(90deg, #ffe66d, #f7b731);"></div></div>
+                </div>
+                <div class="metric">
+                    <div class="metric-label">Stability</div>
+                    <div class="metric-value" id="metric-stability">—</div>
+                    <div class="metric-bar"><div class="metric-fill" id="fill-stability" style="width: 0%; background: linear-gradient(90deg, #a8e6cf, #55efc4);"></div></div>
+                </div>
+            </div>
+            <div class="history" id="panel-history"></div>
+            <div class="crises" id="panel-crises"></div>
+        </div>
+
+        <div id="mode-indicator"></div>
+        <div id="connection-info"></div>
+        <div id="stats"></div>
+    </div>
+
+    <script>
+// ═══════════════════════════════════════════════════════════════════════════════
+// REAL DATA: Constitutional democracies with actual metrics
+// ═══════════════════════════════════════════════════════════════════════════════
+
+const CONSTITUTIONS = [
+    {
+        id: 'usa', name: 'United States', year: 1787,
+        population: 331_000_000, democracyIndex: 7.85, pressFreedom: 45, hdi: 0.921, stabilityYears: 237,
+        color: [77, 128, 230],
+        history: 'The oldest surviving codified constitution. Born from revolution, tested by civil war, still evolving.',
+        crises: [
+            { year: 1861, name: 'Civil War', intensity: 1.0 },
+            { year: 1929, name: 'Great Depression', intensity: 0.6 },
+            { year: 1974, name: 'Watergate', intensity: 0.4 },
+            { year: 2021, name: 'Capitol Attack', intensity: 0.5 }
+        ]
+    },
+    {
+        id: 'germany', name: 'Germany', year: 1949,
+        population: 83_000_000, democracyIndex: 8.80, pressFreedom: 21, hdi: 0.942, stabilityYears: 75,
+        color: [230, 153, 51],
+        history: 'The Grundgesetz: written in the shadow of fascism. Article 1: "Human dignity shall be inviolable."',
+        crises: [
+            { year: 1961, name: 'Berlin Wall', intensity: 0.7 },
+            { year: 1990, name: 'Reunification', intensity: 0.3 }
+        ]
+    },
+    {
+        id: 'india', name: 'India', year: 1950,
+        population: 1_400_000_000, democracyIndex: 7.04, pressFreedom: 36, hdi: 0.633, stabilityYears: 74,
+        color: [255, 153, 51],
+        history: 'The world\'s longest constitution for the world\'s largest democracy. Unity in diversity.',
+        crises: [
+            { year: 1975, name: 'Emergency', intensity: 0.9 },
+            { year: 1984, name: 'Assassination & Riots', intensity: 0.8 },
+            { year: 1992, name: 'Babri Masjid', intensity: 0.6 }
+        ]
+    },
+    {
+        id: 'southafrica', name: 'South Africa', year: 1996,
+        population: 60_000_000, democracyIndex: 7.05, pressFreedom: 25, hdi: 0.713, stabilityYears: 28,
+        color: [77, 204, 102],
+        history: 'Born from apartheid\'s ashes. The most progressive bill of rights. Ubuntu: "I am because we are."',
+        crises: [
+            { year: 2008, name: 'Xenophobic Violence', intensity: 0.5 },
+            { year: 2021, name: 'Zuma Riots', intensity: 0.6 }
+        ]
+    },
+    {
+        id: 'japan', name: 'Japan', year: 1947,
+        population: 125_000_000, democracyIndex: 8.33, pressFreedom: 29, hdi: 0.925, stabilityYears: 77,
+        color: [230, 77, 102],
+        history: 'Article 9: "The Japanese people forever renounce war." The pacifist constitution.',
+        crises: [
+            { year: 1960, name: 'Anpo Protests', intensity: 0.4 },
+            { year: 2011, name: 'Fukushima', intensity: 0.5 }
+        ]
+    },
+    {
+        id: 'france', name: 'France', year: 1958,
+        population: 67_000_000, democracyIndex: 8.07, pressFreedom: 24, hdi: 0.903, stabilityYears: 66,
+        color: [77, 77, 204],
+        history: 'The Fifth Republic, born from crisis. Laïcité: the separation that defines.',
+        crises: [
+            { year: 1968, name: 'May 68', intensity: 0.7 },
+            { year: 2005, name: 'Banlieue Riots', intensity: 0.5 },
+            { year: 2018, name: 'Gilets Jaunes', intensity: 0.4 }
+        ]
+    },
+    {
+        id: 'brazil', name: 'Brazil', year: 1988,
+        population: 214_000_000, democracyIndex: 6.78, pressFreedom: 32, hdi: 0.754, stabilityYears: 36,
+        color: [51, 200, 77],
+        history: 'The Citizen\'s Constitution. Written after military dictatorship, enshrines healthcare and indigenous rights.',
+        crises: [
+            { year: 2016, name: 'Dilma Impeachment', intensity: 0.6 },
+            { year: 2023, name: 'Brasília Attack', intensity: 0.5 }
+        ]
+    },
+    {
+        id: 'sweden', name: 'Sweden', year: 1974,
+        population: 10_500_000, democracyIndex: 9.39, pressFreedom: 5, hdi: 0.947, stabilityYears: 50,
+        color: [255, 204, 51],
+        history: 'The Instrument of Government. A model of social democracy: welfare state constitutionalized.',
+        crises: [
+            { year: 1986, name: 'Palme Assassination', intensity: 0.6 }
+        ]
+    },
+    {
+        id: 'switzerland', name: 'Switzerland', year: 1999,
+        population: 8_700_000, democracyIndex: 9.14, pressFreedom: 12, hdi: 0.962, stabilityYears: 25,
+        color: [230, 51, 51],
+        history: 'Direct democracy in action. The people vote on everything. Neutrality enshrined.',
+        crises: []
+    },
+    {
+        id: 'norway', name: 'Norway', year: 1814,
+        population: 5_400_000, democracyIndex: 9.81, pressFreedom: 1, hdi: 0.961, stabilityYears: 210,
+        color: [51, 102, 230],
+        history: 'Europe\'s oldest constitution still in use. Written in weeks, endured for centuries.',
+        crises: [
+            { year: 1940, name: 'Nazi Occupation', intensity: 0.8 },
+            { year: 2011, name: 'Utøya Attack', intensity: 0.7 }
+        ]
+    },
+    {
+        id: 'southkorea', name: 'South Korea', year: 1987,
+        population: 51_000_000, democracyIndex: 8.03, pressFreedom: 47, hdi: 0.925, stabilityYears: 37,
+        color: [102, 153, 255],
+        history: 'Won in the streets. The June Democracy Movement ended military rule.',
+        crises: [
+            { year: 1997, name: 'IMF Crisis', intensity: 0.6 },
+            { year: 2016, name: 'Candlelight Revolution', intensity: 0.3 }
+        ]
+    },
+    {
+        id: 'canada', name: 'Canada', year: 1982,
+        population: 38_000_000, democracyIndex: 9.22, pressFreedom: 15, hdi: 0.936, stabilityYears: 42,
+        color: [230, 51, 51],
+        history: 'The Charter of Rights and Freedoms. Bilingualism and multiculturalism as founding principles.',
+        crises: [
+            { year: 1995, name: 'Quebec Referendum', intensity: 0.5 },
+            { year: 2022, name: 'Convoy Protests', intensity: 0.3 }
+        ]
+    },
+    {
+        id: 'australia', name: 'Australia', year: 1901,
+        population: 26_000_000, democracyIndex: 8.71, pressFreedom: 27, hdi: 0.951, stabilityYears: 123,
+        color: [230, 180, 51],
+        history: 'Federation: six colonies becoming one. Compulsory voting. Still debating the republic.',
+        crises: [
+            { year: 1975, name: 'Dismissal Crisis', intensity: 0.6 }
+        ]
+    },
+    {
+        id: 'newzealand', name: 'New Zealand', year: 1852,
+        population: 5_100_000, democracyIndex: 9.61, pressFreedom: 11, hdi: 0.937, stabilityYears: 172,
+        color: [51, 200, 200],
+        history: 'Uncodified but constitutional. Treaty of Waitangi. First to give women the vote.',
+        crises: [
+            { year: 2019, name: 'Christchurch Attack', intensity: 0.6 }
+        ]
+    },
+    {
+        id: 'estonia', name: 'Estonia', year: 1992,
+        population: 1_300_000, democracyIndex: 7.96, pressFreedom: 8, hdi: 0.890, stabilityYears: 32,
+        color: [51, 153, 230],
+        history: 'The digital republic. E-governance pioneer. Singing Revolution to cyber-state.',
+        crises: [
+            { year: 2007, name: 'Cyber Attack', intensity: 0.4 }
+        ]
+    },
+    {
+        id: 'costarica', name: 'Costa Rica', year: 1949,
+        population: 5_200_000, democracyIndex: 8.29, pressFreedom: 18, hdi: 0.806, stabilityYears: 75,
+        color: [51, 230, 128],
+        history: 'No army since 1949. The budget went to education. Proof that peace is a choice.',
+        crises: []
+    },
+    {
+        id: 'ireland', name: 'Ireland', year: 1937,
+        population: 5_000_000, democracyIndex: 9.00, pressFreedom: 9, hdi: 0.945, stabilityYears: 87,
+        color: [51, 200, 102],
+        history: 'From colonial subject to European partner. Social revolution through referendum.',
+        crises: [
+            { year: 1969, name: 'Troubles Begin', intensity: 0.7 },
+            { year: 2008, name: 'Financial Crisis', intensity: 0.6 }
+        ]
+    },
+    {
+        id: 'spain', name: 'Spain', year: 1978,
+        population: 47_000_000, democracyIndex: 7.97, pressFreedom: 32, hdi: 0.905, stabilityYears: 46,
+        color: [230, 102, 51],
+        history: 'The Transition. From Franco to freedom. Autonomy for regions, but separatism simmers.',
+        crises: [
+            { year: 1981, name: '23-F Coup Attempt', intensity: 0.7 },
+            { year: 2017, name: 'Catalan Crisis', intensity: 0.5 }
+        ]
+    }
+];
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// PARTICLE SYSTEM (Canvas 2D - Universal Compatibility)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+
+const PARTICLE_COUNT = 80000;
+let particles = [];
+let attractors = [];
+
+// View state
+let zoom = 0.8;
+let panX = 0, panY = 0;
+let mouseX = 0, mouseY = 0;
+let mouseWorldX = 0, mouseWorldY = 0;
+let mouseDown = false;
+let rightMouseDown = false;
+let middleMouseDown = false;
+let shiftDown = false;
+let isPanning = false;
+let lastPanX = 0, lastPanY = 0;
+let chaos = 0;
+let healing = 0;
+let showVoronoi = false;
+let showTrails = false;
+let liberated = false;
+
+function resize() {
+    canvas.width = window.innerWidth * devicePixelRatio;
+    canvas.height = window.innerHeight * devicePixelRatio;
+    canvas.style.width = window.innerWidth + 'px';
+    canvas.style.height = window.innerHeight + 'px';
+    ctx.scale(devicePixelRatio, devicePixelRatio);
+}
+
+function worldToScreen(x, y) {
+    const cx = window.innerWidth / 2;
+    const cy = window.innerHeight / 2;
+    const scale = Math.min(window.innerWidth, window.innerHeight) * 0.4 * zoom;
+    return {
+        x: cx + (x + panX) * scale,
+        y: cy - (y + panY) * scale
+    };
+}
+
+function screenToWorld(sx, sy) {
+    const cx = window.innerWidth / 2;
+    const cy = window.innerHeight / 2;
+    const scale = Math.min(window.innerWidth, window.innerHeight) * 0.4 * zoom;
+    return {
+        x: (sx - cx) / scale - panX,
+        y: -(sy - cy) / scale - panY
+    };
+}
+
+// Initialize attractors from constitution data
+function initAttractors() {
+    attractors = CONSTITUTIONS.map(c => ({
+        x: (c.democracyIndex - 5) / 5,           // -1 to 1
+        y: (100 - c.pressFreedom * 2) / 100,     // Higher freedom = higher y
+        mass: c.democracyIndex,
+        color: c.color,
+        constitution: c
+    }));
+}
+
+// Initialize particles distributed by population
+function initParticles() {
+    particles = [];
+    const totalWeight = CONSTITUTIONS.reduce((sum, c) => sum + Math.sqrt(c.population), 0);
+
+    CONSTITUTIONS.forEach((c, idx) => {
+        const weight = Math.sqrt(c.population) / totalWeight;
+        const count = Math.floor(PARTICLE_COUNT * weight);
+        const attractor = attractors[idx];
+
+        for (let i = 0; i < count; i++) {
+            const angle = Math.random() * Math.PI * 2;
+            const radius = Math.random() * 0.12;
+            particles.push({
+                x: attractor.x + Math.cos(angle) * radius,
+                y: attractor.y + Math.sin(angle) * radius,
+                vx: (Math.random() - 0.5) * 0.01,
+                vy: (Math.random() - 0.5) * 0.01,
+                homeIdx: idx,
+                color: [...c.color],
+                life: 0.5 + Math.random() * 0.5
+            });
+        }
+    });
+
+    // Fill remaining
+    while (particles.length < PARTICLE_COUNT) {
+        const idx = Math.floor(Math.random() * CONSTITUTIONS.length);
+        const c = CONSTITUTIONS[idx];
+        const attractor = attractors[idx];
+        particles.push({
+            x: attractor.x + (Math.random() - 0.5) * 0.2,
+            y: attractor.y + (Math.random() - 0.5) * 0.2,
+            vx: 0, vy: 0,
+            homeIdx: idx,
+            color: [...c.color],
+            life: Math.random()
+        });
+    }
+}
+
+function updateParticles(dt) {
+    const dtCapped = Math.min(dt, 0.033);
+
+    for (let i = 0; i < particles.length; i++) {
+        const p = particles[i];
+        const home = attractors[p.homeIdx];
+
+        // Force toward home attractor (reduced if liberated)
+        const toHomeX = home.x - p.x;
+        const toHomeY = home.y - p.y;
+        const homeDist = Math.sqrt(toHomeX * toHomeX + toHomeY * toHomeY) + 0.01;
+        const liberationFactor = liberated ? 0.1 : 1.0;
+        const homeForce = ((0.3 + home.mass * 0.05) / (homeDist + 0.3)) * liberationFactor;
+
+        let fx = (toHomeX / homeDist) * homeForce;
+        let fy = (toHomeY / homeDist) * homeForce;
+
+        // Influence from nearby attractors
+        for (let j = 0; j < attractors.length; j++) {
+            if (j === p.homeIdx) continue;
+            const att = attractors[j];
+            const dx = att.x - p.x;
+            const dy = att.y - p.y;
+            const dist = Math.sqrt(dx * dx + dy * dy) + 0.01;
+            if (dist < 0.5) {
+                const similarity = 1 - Math.abs(home.mass - att.mass) / 10;
+                const f = similarity * att.mass * 0.005 / (dist * dist + 0.5);
+                fx += (dx / dist) * f;
+                fy += (dy / dist) * f;
+            }
+        }
+
+        // Mouse interaction
+        if (mouseDown || rightMouseDown) {
+            const toMouseX = mouseWorldX - p.x;
+            const toMouseY = mouseWorldY - p.y;
+            const mouseDist = Math.sqrt(toMouseX * toMouseX + toMouseY * toMouseY) + 0.01;
+            if (mouseDist < 0.4) {
+                const mouseForce = (rightMouseDown ? -2.0 : 2.0) / (mouseDist + 0.05);
+                fx += (toMouseX / mouseDist) * mouseForce;
+                fy += (toMouseY / mouseDist) * mouseForce;
+            }
+        }
+
+        // Chaos
+        if (chaos > 0.01) {
+            fx += (Math.random() - 0.5) * chaos * 3;
+            fy += (Math.random() - 0.5) * chaos * 3;
+        }
+
+        // Apply forces
+        p.vx += fx * dtCapped;
+        p.vy += fy * dtCapped;
+
+        // Damping
+        const damping = healing > 0.01 ? 0.92 : 0.97;
+        p.vx *= damping;
+        p.vy *= damping;
+
+        // Clamp velocity
+        const speed = Math.sqrt(p.vx * p.vx + p.vy * p.vy);
+        if (speed > 0.5) {
+            p.vx = (p.vx / speed) * 0.5;
+            p.vy = (p.vy / speed) * 0.5;
+        }
+
+        // Update position
+        p.x += p.vx * dtCapped;
+        p.y += p.vy * dtCapped;
+
+        // Soft boundary
+        if (p.x < -1.3) p.x = 1.3;
+        if (p.x > 1.3) p.x = -1.3;
+        if (p.y < -1.3) p.y = 1.3;
+        if (p.y > 1.3) p.y = -1.3;
+
+        // Life based on speed and home proximity
+        p.life = 0.3 + speed * 1.5 + (1 / (homeDist + 0.5)) * 0.3;
+        p.life = Math.min(1, p.life);
+
+        // Color drift toward home
+        const homeColor = home.color;
+        p.color[0] += (homeColor[0] - p.color[0]) * 0.02;
+        p.color[1] += (homeColor[1] - p.color[1]) * 0.02;
+        p.color[2] += (homeColor[2] - p.color[2]) * 0.02;
+    }
+
+    // Decay chaos and healing
+    chaos *= 0.98;
+    healing *= 0.99;
+}
+
+function render() {
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+
+    // Clear with dark background
+    ctx.fillStyle = '#05050a';
+    ctx.fillRect(0, 0, w, h);
+
+    // Draw subtle grid
+    ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+    ctx.lineWidth = 1;
+
+    // Vertical center line
+    const center = worldToScreen(0, 0);
+    ctx.beginPath();
+    ctx.moveTo(center.x, 0);
+    ctx.lineTo(center.x, h);
+    ctx.stroke();
+
+    // Horizontal center line
+    ctx.beginPath();
+    ctx.moveTo(0, center.y);
+    ctx.lineTo(w, center.y);
+    ctx.stroke();
+
+    // Draw Voronoi boundaries if enabled
+    drawVoronoiBoundaries();
+
+    // Draw particles with additive blending
+    ctx.globalCompositeOperation = 'lighter';
+
+    for (let i = 0; i < particles.length; i++) {
+        const p = particles[i];
+        const pos = worldToScreen(p.x, p.y);
+
+        if (pos.x < -10 || pos.x > w + 10 || pos.y < -10 || pos.y > h + 10) continue;
+
+        const alpha = p.life * 0.6;
+        const size = (1.5 + p.life * 1.5) * zoom;
+
+        ctx.fillStyle = `rgba(${Math.floor(p.color[0])},${Math.floor(p.color[1])},${Math.floor(p.color[2])},${alpha})`;
+        ctx.beginPath();
+        ctx.arc(pos.x, pos.y, size, 0, Math.PI * 2);
+        ctx.fill();
+    }
+
+    ctx.globalCompositeOperation = 'source-over';
+
+    // Draw attractor labels
+    ctx.font = '11px system-ui';
+    ctx.textAlign = 'center';
+
+    attractors.forEach((att, i) => {
+        const pos = worldToScreen(att.x, att.y);
+        const c = att.constitution;
+
+        // Glow
+        const gradient = ctx.createRadialGradient(pos.x, pos.y, 0, pos.x, pos.y, 30 * zoom);
+        gradient.addColorStop(0, `rgba(${c.color[0]},${c.color[1]},${c.color[2]},0.3)`);
+        gradient.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = gradient;
+        ctx.beginPath();
+        ctx.arc(pos.x, pos.y, 30 * zoom, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Core
+        ctx.fillStyle = `rgba(${c.color[0]},${c.color[1]},${c.color[2]},0.9)`;
+        ctx.beginPath();
+        ctx.arc(pos.x, pos.y, 5 * zoom, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Label
+        ctx.fillStyle = 'rgba(255,255,255,0.8)';
+        ctx.fillText(c.name, pos.x, pos.y - 12 * zoom);
+        ctx.fillStyle = 'rgba(255,255,255,0.4)';
+        ctx.fillText(c.year, pos.x, pos.y + 18 * zoom);
+    });
+
+    // Stats
+    document.getElementById('stats').innerHTML = `
+        ${particles.length.toLocaleString()} particles<br>
+        ${attractors.length} nations<br>
+        zoom: ${zoom.toFixed(2)}x
+    `;
+}
+
+// Simple Voronoi drawing using midpoint perpendiculars
+function drawVoronoiBoundaries() {
+    if (!showVoronoi) return;
+
+    ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+    ctx.lineWidth = 1;
+
+    // Draw connections between nearby attractors with perpendicular bisectors
+    for (let i = 0; i < attractors.length; i++) {
+        for (let j = i + 1; j < attractors.length; j++) {
+            const a1 = attractors[i];
+            const a2 = attractors[j];
+
+            const dist = Math.sqrt((a1.x - a2.x) ** 2 + (a1.y - a2.y) ** 2);
+            if (dist > 0.8) continue; // Only nearby pairs
+
+            // Midpoint
+            const midX = (a1.x + a2.x) / 2;
+            const midY = (a1.y + a2.y) / 2;
+
+            // Perpendicular direction
+            const dx = a2.x - a1.x;
+            const dy = a2.y - a1.y;
+            const perpX = -dy;
+            const perpY = dx;
+
+            // Normalize and extend
+            const len = Math.sqrt(perpX * perpX + perpY * perpY);
+            const scale = 0.5;
+
+            const p1 = worldToScreen(midX + perpX / len * scale, midY + perpY / len * scale);
+            const p2 = worldToScreen(midX - perpX / len * scale, midY - perpY / len * scale);
+
+            ctx.beginPath();
+            ctx.moveTo(p1.x, p1.y);
+            ctx.lineTo(p2.x, p2.y);
+            ctx.stroke();
+        }
+    }
+}
+
+function showConstitutionInfo(c) {
+    const panel = document.getElementById('info-panel');
+    panel.classList.add('visible');
+
+    document.getElementById('panel-name').textContent = c.name;
+    document.getElementById('panel-name').style.color = `rgb(${c.color.join(',')})`;
+    document.getElementById('panel-country').textContent = `EST. ${c.year} · ${c.population.toLocaleString()} CITIZENS`;
+
+    document.getElementById('metric-democracy').textContent = c.democracyIndex.toFixed(2);
+    document.getElementById('fill-democracy').style.width = (c.democracyIndex * 10) + '%';
+
+    const pressScore = 100 - c.pressFreedom;
+    document.getElementById('metric-press').textContent = pressScore.toFixed(0);
+    document.getElementById('fill-press').style.width = pressScore + '%';
+
+    document.getElementById('metric-hdi').textContent = c.hdi.toFixed(3);
+    document.getElementById('fill-hdi').style.width = (c.hdi * 100) + '%';
+
+    document.getElementById('metric-stability').textContent = c.stabilityYears + 'y';
+    document.getElementById('fill-stability').style.width = Math.min(100, c.stabilityYears / 2.5) + '%';
+
+    document.getElementById('panel-history').textContent = c.history;
+
+    // Show crises
+    const crisesDiv = document.getElementById('panel-crises');
+    if (c.crises && c.crises.length > 0) {
+        crisesDiv.innerHTML = `
+            <div class="crises-title">Constitutional Crises</div>
+            ${c.crises.map(crisis => `
+                <div class="crisis-item">
+                    <span class="crisis-year">${crisis.year}</span>
+                    <span class="crisis-name">${crisis.name}</span>
+                    <div class="crisis-intensity">
+                        <div class="crisis-intensity-fill" style="width: ${crisis.intensity * 100}%"></div>
+                    </div>
+                </div>
+            `).join('')}
+        `;
+        crisesDiv.style.display = 'block';
+    } else {
+        crisesDiv.innerHTML = `
+            <div class="crises-title">Constitutional Crises</div>
+            <div style="color: #555; font-size: 0.8rem;">No major crises recorded</div>
+        `;
+    }
+}
+
+// Event handlers
+canvas.addEventListener('mousemove', (e) => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+    const world = screenToWorld(mouseX, mouseY);
+    mouseWorldX = world.x;
+    mouseWorldY = world.y;
+
+    // Handle panning
+    if (isPanning) {
+        const scale = Math.min(window.innerWidth, window.innerHeight) * 0.4 * zoom;
+        panX += (mouseX - lastPanX) / scale;
+        panY -= (mouseY - lastPanY) / scale;
+        lastPanX = mouseX;
+        lastPanY = mouseY;
+    }
+});
+
+canvas.addEventListener('mousedown', (e) => {
+    // Middle mouse or shift+left = pan
+    if (e.button === 1 || (e.button === 0 && e.shiftKey)) {
+        isPanning = true;
+        lastPanX = mouseX;
+        lastPanY = mouseY;
+        e.preventDefault();
+        return;
+    }
+
+    if (e.button === 0) {
+        mouseDown = true;
+
+        // Check for attractor click
+        for (const att of attractors) {
+            const pos = worldToScreen(att.x, att.y);
+            const dist = Math.sqrt((mouseX - pos.x) ** 2 + (mouseY - pos.y) ** 2);
+            if (dist < 40) {
+                showConstitutionInfo(att.constitution);
+                break;
+            }
+        }
+    }
+    if (e.button === 2) rightMouseDown = true;
+});
+
+canvas.addEventListener('mouseup', (e) => {
+    if (e.button === 0) mouseDown = false;
+    if (e.button === 1) isPanning = false;
+    if (e.button === 0 && isPanning) isPanning = false;
+    if (e.button === 2) rightMouseDown = false;
+});
+
+canvas.addEventListener('mouseleave', () => {
+    isPanning = false;
+    mouseDown = false;
+    rightMouseDown = false;
+});
+
+canvas.addEventListener('contextmenu', (e) => e.preventDefault());
+
+canvas.addEventListener('wheel', (e) => {
+    e.preventDefault();
+
+    // Zoom toward mouse position
+    const worldBefore = screenToWorld(mouseX, mouseY);
+
+    const zoomFactor = e.deltaY > 0 ? 0.9 : 1.1;
+    zoom = Math.max(0.2, Math.min(5, zoom * zoomFactor));
+
+    const worldAfter = screenToWorld(mouseX, mouseY);
+    panX += worldAfter.x - worldBefore.x;
+    panY += worldAfter.y - worldBefore.y;
+});
+
+// Keyboard shortcuts
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'v' || e.key === 'V') {
+        showVoronoi = !showVoronoi;
+    }
+    if (e.key === 't' || e.key === 'T') {
+        showTrails = !showTrails;
+    }
+    if (e.key === 'r' || e.key === 'R') {
+        zoom = 0.8;
+        panX = 0;
+        panY = 0;
+    }
+    if (e.key === 'Escape') {
+        document.getElementById('info-panel').classList.remove('visible');
+    }
+    if (e.key === 'Shift') {
+        shiftDown = true;
+        canvas.style.cursor = 'grab';
+    }
+});
+
+document.addEventListener('keyup', (e) => {
+    if (e.key === 'Shift') {
+        shiftDown = false;
+        canvas.style.cursor = 'default';
+    }
+});
+
+// Controls
+document.getElementById('btn-chaos').addEventListener('click', () => {
+    chaos = 2.0;
+    showModeIndicator('CHAOS');
+});
+
+document.getElementById('btn-heal').addEventListener('click', () => {
+    healing = 1;
+    showModeIndicator('HEALING');
+});
+
+document.getElementById('btn-liberate').addEventListener('click', () => {
+    liberated = !liberated;
+    document.getElementById('btn-liberate').classList.toggle('active', liberated);
+    showModeIndicator(liberated ? 'LIBERATED' : 'BOUND');
+});
+
+document.getElementById('btn-voronoi').addEventListener('click', () => {
+    showVoronoi = !showVoronoi;
+    document.getElementById('btn-voronoi').classList.toggle('active', showVoronoi);
+});
+
+document.getElementById('btn-reset').addEventListener('click', () => {
+    zoom = 0.8;
+    panX = 0;
+    panY = 0;
+    liberated = false;
+    document.getElementById('btn-liberate').classList.remove('active');
+});
+
+function showModeIndicator(text) {
+    const indicator = document.getElementById('mode-indicator');
+    indicator.textContent = text;
+    indicator.classList.add('visible');
+    setTimeout(() => indicator.classList.remove('visible'), 1500);
+}
+
+// Main loop
+let lastTime = performance.now();
+
+function frame(time) {
+    const dt = (time - lastTime) / 1000;
+    lastTime = time;
+
+    updateParticles(dt);
+    render();
+
+    requestAnimationFrame(frame);
+}
+
+// Initialize
+resize();
+window.addEventListener('resize', resize);
+initAttractors();
+initParticles();
+requestAnimationFrame(frame);
+
+console.log('Constitutional Fields initialized with', PARTICLE_COUNT, 'particles');
+    </script>
+</body>
+</html>

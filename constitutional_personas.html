@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Constitutional Personas | Democratic Architectures in Philosophical Space</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://d3js.org/d3-delaunay.v6.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #06060a;
+            color: #e8e8e8;
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            overflow: hidden;
+            min-height: 100vh;
+        }
+
+        #container {
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        #visualization {
+            flex: 1;
+            position: relative;
+            background: radial-gradient(ellipse at center, #0f0f18 0%, #06060a 100%);
+        }
+
+        #sidebar {
+            width: 380px;
+            background: linear-gradient(180deg, #0a0a12 0%, #08080e 100%);
+            border-left: 1px solid rgba(255,255,255,0.05);
+            padding: 30px;
+            overflow-y: auto;
+            transition: all 0.5s ease;
+        }
+
+        #sidebar h1 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #fff 0%, #888 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        #sidebar .subtitle {
+            font-size: 0.9rem;
+            color: #666;
+            font-style: italic;
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+
+        .persona-card {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+            transition: all 0.4s ease;
+            opacity: 0.3;
+        }
+
+        .persona-card.active {
+            opacity: 1;
+            background: rgba(255,255,255,0.04);
+            border-color: rgba(255,255,255,0.15);
+            box-shadow: 0 0 40px rgba(255,255,255,0.03);
+        }
+
+        .persona-name {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+            transition: color 0.3s ease;
+        }
+
+        .persona-country {
+            font-size: 0.85rem;
+            color: #888;
+            font-family: 'JetBrains Mono', monospace;
+            letter-spacing: 0.1em;
+            margin-bottom: 16px;
+        }
+
+        .persona-motto {
+            font-size: 1.1rem;
+            font-style: italic;
+            line-height: 1.6;
+            color: #aaa;
+            margin-bottom: 16px;
+            padding-left: 16px;
+            border-left: 2px solid #333;
+        }
+
+        .persona-traits {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .trait {
+            font-size: 0.75rem;
+            font-family: 'JetBrains Mono', monospace;
+            padding: 4px 10px;
+            border-radius: 20px;
+            background: rgba(255,255,255,0.05);
+            color: #777;
+            transition: all 0.3s ease;
+        }
+
+        .persona-card.active .trait {
+            background: rgba(255,255,255,0.1);
+            color: #aaa;
+        }
+
+        .axis-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            fill: #444;
+            letter-spacing: 0.15em;
+        }
+
+        .axis-label-emphasis {
+            fill: #666;
+        }
+
+        svg {
+            display: block;
+        }
+
+        .voronoi-cell {
+            stroke: rgba(255,255,255,0.15);
+            stroke-width: 1.5;
+            transition: all 0.4s ease;
+            cursor: pointer;
+        }
+
+        .voronoi-cell:hover {
+            stroke: rgba(255,255,255,0.4);
+            stroke-width: 2;
+        }
+
+        .constitution-point {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .constitution-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            fill: #ccc;
+            pointer-events: none;
+            transition: all 0.3s ease;
+        }
+
+        .glow {
+            filter: url(#glow);
+        }
+
+        #legend {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            color: #555;
+            line-height: 1.8;
+        }
+
+        #instructions {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            color: #444;
+            background: rgba(0,0,0,0.5);
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .quadrant-label {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 12px;
+            fill: #333;
+            font-style: italic;
+        }
+
+        /* Scrollbar styling */
+        #sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        #sidebar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        #sidebar::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <div id="visualization">
+            <svg id="voronoi-svg"></svg>
+            <div id="instructions">
+                Hover over cells to explore constitutional personas<br>
+                Click to lock selection
+            </div>
+            <div id="legend">
+                X: Individual Liberty ← → Collective Welfare<br>
+                Y: Centralized Power ← → Distributed Power
+            </div>
+        </div>
+        <div id="sidebar">
+            <h1>Constitutional Personas</h1>
+            <p class="subtitle">
+                Democratic architectures mapped in philosophical space.
+                Each Voronoi cell represents a constitution's domain of influence—
+                proximity indicates kinship in democratic thought.
+            </p>
+            <div id="persona-display">
+                <div class="persona-card active" id="default-card">
+                    <div class="persona-name">Select a Constitution</div>
+                    <div class="persona-country">HOVER OR CLICK TO EXPLORE</div>
+                    <div class="persona-motto">
+                        "Each cell in this tessellation represents a unique philosophy
+                        of governance—a vision of how power should flow between
+                        the individual and the collective."
+                    </div>
+                    <div class="persona-traits">
+                        <span class="trait">18 Constitutions</span>
+                        <span class="trait">200+ Years</span>
+                        <span class="trait">5 Continents</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Constitutional data with philosophical positioning
+        const constitutions = [
+            {
+                id: "usa",
+                name: "The Founders' Covenant",
+                country: "United States",
+                year: 1787,
+                x: -0.7, y: 0.8,
+                hue: 220,
+                motto: "We hold these truths to be self-evident—that liberty is the birthright of all.",
+                traits: ["Individualist", "Federalist", "Rights-Bearer", "Revolutionary"]
+            },
+            {
+                id: "germany",
+                name: "The Phoenix Charter",
+                country: "Germany",
+                year: 1949,
+                x: 0.2, y: 0.6,
+                hue: 30,
+                motto: "From the ashes of tyranny, we build dignity as the cornerstone of all law.",
+                traits: ["Dignitarian", "Federal", "Social-Market", "Remembering"]
+            },
+            {
+                id: "france",
+                name: "The Republic's Voice",
+                country: "France",
+                year: 1958,
+                x: -0.2, y: -0.3,
+                hue: 245,
+                motto: "Liberté, égalité, fraternité—the revolution continues in law.",
+                traits: ["Republican", "Secular", "Unitary", "Universal"]
+            },
+            {
+                id: "india",
+                name: "The Mosaic Compact",
+                country: "India",
+                year: 1950,
+                x: 0.3, y: 0.7,
+                hue: 25,
+                motto: "Unity in diversity—a billion voices, one constitutional song.",
+                traits: ["Pluralist", "Federal", "Directive", "Accommodating"]
+            },
+            {
+                id: "southafrica",
+                name: "The Rainbow Covenant",
+                country: "South Africa",
+                year: 1996,
+                x: 0.5, y: 0.3,
+                hue: 140,
+                motto: "Never again. From the wound of apartheid blooms transformative justice.",
+                traits: ["Transformative", "Rights-Expansive", "Ubuntu", "Healing"]
+            },
+            {
+                id: "japan",
+                name: "The Pacifist's Oath",
+                country: "Japan",
+                year: 1947,
+                x: 0.1, y: -0.2,
+                hue: 340,
+                motto: "We renounce war. In peace, we find our strength.",
+                traits: ["Pacifist", "Parliamentary", "Harmonious", "Restrained"]
+            },
+            {
+                id: "sweden",
+                name: "The Social Pact",
+                country: "Sweden",
+                year: 1974,
+                x: 0.7, y: 0.1,
+                hue: 50,
+                motto: "The welfare of the people is the highest law.",
+                traits: ["Social-Democratic", "Egalitarian", "Transparent", "Nordic"]
+            },
+            {
+                id: "switzerland",
+                name: "The Alpine Concordat",
+                country: "Switzerland",
+                year: 1999,
+                x: -0.3, y: 0.95,
+                hue: 0,
+                motto: "The people speak directly—every voice shapes the nation.",
+                traits: ["Direct-Democratic", "Cantonal", "Neutral", "Consensual"]
+            },
+            {
+                id: "costarica",
+                name: "The Verdant Charter",
+                country: "Costa Rica",
+                year: 1949,
+                x: 0.4, y: 0.0,
+                hue: 160,
+                motto: "We abolished the army to feed the schools. Peace is our weapon.",
+                traits: ["Demilitarized", "Ecological", "Educational", "Stable"]
+            },
+            {
+                id: "canada",
+                name: "The Maple Accord",
+                country: "Canada",
+                year: 1982,
+                x: 0.0, y: 0.5,
+                hue: 5,
+                motto: "Peace, order, and good government—rights within community.",
+                traits: ["Bilingual", "Federal", "Charter-Rights", "Multicultural"]
+            },
+            {
+                id: "estonia",
+                name: "The Digital Republic",
+                country: "Estonia",
+                year: 1992,
+                x: -0.4, y: 0.2,
+                hue: 195,
+                motto: "A nation in code—democracy at the speed of light.",
+                traits: ["E-Governance", "Post-Soviet", "Innovative", "Resilient"]
+            },
+            {
+                id: "brazil",
+                name: "The Amazonian Covenant",
+                country: "Brazil",
+                year: 1988,
+                x: 0.6, y: 0.4,
+                hue: 85,
+                motto: "From military rule to citizen's constitution—rights bloom in the tropics.",
+                traits: ["Extensive-Rights", "Federal", "Social", "Indigenous-Recognizing"]
+            },
+            {
+                id: "norway",
+                name: "The Fjord Charter",
+                country: "Norway",
+                year: 1814,
+                x: 0.5, y: -0.1,
+                hue: 210,
+                motto: "Europe's oldest democracy in continuous use—stability through evolution.",
+                traits: ["Constitutional-Monarchy", "Sovereign-Fund", "Transparent", "Enduring"]
+            },
+            {
+                id: "southkorea",
+                name: "The Morning Calm",
+                country: "South Korea",
+                year: 1987,
+                x: 0.1, y: -0.4,
+                hue: 200,
+                motto: "From dictatorship to dynamism—democracy won in the streets.",
+                traits: ["Democratic-Transition", "Presidential", "Economic-Rights", "Reunification-Oriented"]
+            },
+            {
+                id: "ireland",
+                name: "The Emerald Covenant",
+                country: "Ireland",
+                year: 1937,
+                x: 0.2, y: -0.5,
+                hue: 130,
+                motto: "From colonial past to European future—identity in sovereignty.",
+                traits: ["Post-Colonial", "Catholic-Heritage", "European", "Evolving"]
+            },
+            {
+                id: "australia",
+                name: "The Southern Cross",
+                country: "Australia",
+                year: 1901,
+                x: -0.5, y: 0.6,
+                hue: 40,
+                motto: "A federation of the far continent—pragmatism under the southern sky.",
+                traits: ["Federal", "Westminster", "Pragmatic", "Evolving"]
+            },
+            {
+                id: "newzealand",
+                name: "The Tui's Song",
+                country: "New Zealand",
+                year: 1852,
+                x: 0.3, y: -0.6,
+                hue: 180,
+                motto: "No single document contains us—our constitution lives and breathes.",
+                traits: ["Uncodified", "Parliamentary", "Treaty-Based", "Progressive"]
+            },
+            {
+                id: "spain",
+                name: "The Iberian Spring",
+                country: "Spain",
+                year: 1978,
+                x: 0.1, y: 0.3,
+                hue: 15,
+                motto: "From Franco's shadow into European light—autonomy within unity.",
+                traits: ["Post-Authoritarian", "Autonomous-Communities", "Monarchical", "European"]
+            }
+        ];
+
+        // Color generation
+        function hslToHex(h, s, l) {
+            s /= 100;
+            l /= 100;
+            const a = s * Math.min(l, 1 - l);
+            const f = n => {
+                const k = (n + h / 30) % 12;
+                const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+                return Math.round(255 * color).toString(16).padStart(2, '0');
+            };
+            return `#${f(0)}${f(8)}${f(4)}`;
+        }
+
+        function getConstitutionColor(c, lightness = 35, saturation = 50) {
+            return hslToHex(c.hue, saturation, lightness);
+        }
+
+        // Setup SVG
+        const container = document.getElementById('visualization');
+        const svg = d3.select('#voronoi-svg');
+
+        function resize() {
+            const width = container.clientWidth;
+            const height = container.clientHeight;
+
+            svg.attr('width', width).attr('height', height);
+
+            return { width, height };
+        }
+
+        let dimensions = resize();
+        window.addEventListener('resize', () => {
+            dimensions = resize();
+            render();
+        });
+
+        // Scale functions
+        function xScale(x) {
+            const margin = 80;
+            return margin + (x + 1) / 2 * (dimensions.width - 2 * margin);
+        }
+
+        function yScale(y) {
+            const margin = 80;
+            return dimensions.height - margin - (y + 1) / 2 * (dimensions.height - 2 * margin);
+        }
+
+        // Add SVG filters for glow effect
+        const defs = svg.append('defs');
+
+        const filter = defs.append('filter')
+            .attr('id', 'glow')
+            .attr('x', '-50%')
+            .attr('y', '-50%')
+            .attr('width', '200%')
+            .attr('height', '200%');
+
+        filter.append('feGaussianBlur')
+            .attr('stdDeviation', '3')
+            .attr('result', 'coloredBlur');
+
+        const feMerge = filter.append('feMerge');
+        feMerge.append('feMergeNode').attr('in', 'coloredBlur');
+        feMerge.append('feMergeNode').attr('in', 'SourceGraphic');
+
+        // State
+        let selectedConstitution = null;
+        let lockedSelection = false;
+
+        function updatePersonaCard(constitution) {
+            const display = document.getElementById('persona-display');
+
+            if (!constitution) {
+                document.getElementById('default-card').classList.add('active');
+                return;
+            }
+
+            const color = getConstitutionColor(constitution, 50, 60);
+
+            display.innerHTML = `
+                <div class="persona-card active">
+                    <div class="persona-name" style="color: ${color}">${constitution.name}</div>
+                    <div class="persona-country">${constitution.country.toUpperCase()} · ${constitution.year}</div>
+                    <div class="persona-motto" style="border-left-color: ${color}">
+                        "${constitution.motto}"
+                    </div>
+                    <div class="persona-traits">
+                        ${constitution.traits.map(t => `<span class="trait" style="border: 1px solid ${color}40">${t}</span>`).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function render() {
+            svg.selectAll('*').remove();
+
+            // Re-add defs
+            const defs = svg.append('defs');
+            const filter = defs.append('filter')
+                .attr('id', 'glow')
+                .attr('x', '-50%')
+                .attr('y', '-50%')
+                .attr('width', '200%')
+                .attr('height', '200%');
+
+            filter.append('feGaussianBlur')
+                .attr('stdDeviation', '4')
+                .attr('result', 'coloredBlur');
+
+            const feMerge = filter.append('feMerge');
+            feMerge.append('feMergeNode').attr('in', 'coloredBlur');
+            feMerge.append('feMergeNode').attr('in', 'SourceGraphic');
+
+            const { width, height } = dimensions;
+
+            // Create points for Voronoi
+            const points = constitutions.map(c => [xScale(c.x), yScale(c.y)]);
+
+            // Generate Voronoi
+            const delaunay = d3.Delaunay.from(points);
+            const voronoi = delaunay.voronoi([0, 0, width, height]);
+
+            // Draw grid lines
+            const gridGroup = svg.append('g').attr('class', 'grid');
+
+            // Vertical center line
+            gridGroup.append('line')
+                .attr('x1', xScale(0))
+                .attr('y1', 40)
+                .attr('x2', xScale(0))
+                .attr('y2', height - 40)
+                .attr('stroke', '#222')
+                .attr('stroke-dasharray', '4,4');
+
+            // Horizontal center line
+            gridGroup.append('line')
+                .attr('x1', 40)
+                .attr('y1', yScale(0))
+                .attr('x2', width - 40)
+                .attr('y2', yScale(0))
+                .attr('stroke', '#222')
+                .attr('stroke-dasharray', '4,4');
+
+            // Quadrant labels
+            const quadrants = [
+                { x: -0.7, y: 0.85, text: 'Libertarian Federal' },
+                { x: 0.7, y: 0.85, text: 'Social Federal' },
+                { x: -0.7, y: -0.85, text: 'Libertarian Central' },
+                { x: 0.7, y: -0.85, text: 'Social Central' }
+            ];
+
+            quadrants.forEach(q => {
+                svg.append('text')
+                    .attr('class', 'quadrant-label')
+                    .attr('x', xScale(q.x))
+                    .attr('y', yScale(q.y))
+                    .attr('text-anchor', 'middle')
+                    .text(q.text);
+            });
+
+            // Axis labels
+            svg.append('text')
+                .attr('class', 'axis-label')
+                .attr('x', 50)
+                .attr('y', yScale(0))
+                .attr('dy', 4)
+                .text('← INDIVIDUAL LIBERTY');
+
+            svg.append('text')
+                .attr('class', 'axis-label')
+                .attr('x', width - 50)
+                .attr('y', yScale(0))
+                .attr('dy', 4)
+                .attr('text-anchor', 'end')
+                .text('COLLECTIVE WELFARE →');
+
+            svg.append('text')
+                .attr('class', 'axis-label')
+                .attr('x', xScale(0))
+                .attr('y', 30)
+                .attr('text-anchor', 'middle')
+                .text('↑ DISTRIBUTED POWER');
+
+            svg.append('text')
+                .attr('class', 'axis-label')
+                .attr('x', xScale(0))
+                .attr('y', height - 20)
+                .attr('text-anchor', 'middle')
+                .text('↓ CENTRALIZED POWER');
+
+            // Draw Voronoi cells
+            const cellsGroup = svg.append('g').attr('class', 'cells');
+
+            constitutions.forEach((c, i) => {
+                const cell = voronoi.cellPolygon(i);
+                if (!cell) return;
+
+                const pathData = 'M' + cell.map(p => p.join(',')).join('L') + 'Z';
+                const baseColor = getConstitutionColor(c, 20, 40);
+                const hoverColor = getConstitutionColor(c, 30, 50);
+
+                // Cell background with gradient effect
+                const cellPath = cellsGroup.append('path')
+                    .attr('class', 'voronoi-cell')
+                    .attr('d', pathData)
+                    .attr('fill', baseColor)
+                    .attr('data-id', c.id)
+                    .on('mouseenter', function() {
+                        if (!lockedSelection) {
+                            d3.select(this).attr('fill', hoverColor);
+                            selectedConstitution = c;
+                            updatePersonaCard(c);
+                            highlightPoint(c.id);
+                        }
+                    })
+                    .on('mouseleave', function() {
+                        if (!lockedSelection) {
+                            d3.select(this).attr('fill', baseColor);
+                            selectedConstitution = null;
+                            updatePersonaCard(null);
+                            unhighlightAll();
+                        }
+                    })
+                    .on('click', function() {
+                        if (lockedSelection && selectedConstitution?.id === c.id) {
+                            lockedSelection = false;
+                            unhighlightAll();
+                            updatePersonaCard(null);
+                        } else {
+                            lockedSelection = true;
+                            selectedConstitution = c;
+                            updatePersonaCard(c);
+                            highlightPoint(c.id);
+
+                            // Reset all cell colors
+                            cellsGroup.selectAll('.voronoi-cell')
+                                .attr('fill', function() {
+                                    const id = d3.select(this).attr('data-id');
+                                    const con = constitutions.find(x => x.id === id);
+                                    return id === c.id ? hoverColor : getConstitutionColor(con, 20, 40);
+                                });
+                        }
+                    });
+            });
+
+            // Draw points
+            const pointsGroup = svg.append('g').attr('class', 'points');
+
+            constitutions.forEach(c => {
+                const cx = xScale(c.x);
+                const cy = yScale(c.y);
+                const color = getConstitutionColor(c, 60, 70);
+
+                // Outer glow
+                pointsGroup.append('circle')
+                    .attr('class', `constitution-glow constitution-${c.id}`)
+                    .attr('cx', cx)
+                    .attr('cy', cy)
+                    .attr('r', 12)
+                    .attr('fill', color)
+                    .attr('opacity', 0.2)
+                    .style('filter', 'url(#glow)');
+
+                // Core point
+                pointsGroup.append('circle')
+                    .attr('class', `constitution-point constitution-${c.id}`)
+                    .attr('cx', cx)
+                    .attr('cy', cy)
+                    .attr('r', 5)
+                    .attr('fill', color)
+                    .attr('stroke', '#fff')
+                    .attr('stroke-width', 1.5)
+                    .attr('opacity', 0.9);
+
+                // Label
+                pointsGroup.append('text')
+                    .attr('class', `constitution-label constitution-${c.id}`)
+                    .attr('x', cx + 10)
+                    .attr('y', cy + 4)
+                    .text(`${c.country} (${c.year})`);
+            });
+        }
+
+        function highlightPoint(id) {
+            svg.selectAll(`.constitution-${id}`)
+                .transition()
+                .duration(200);
+
+            svg.selectAll(`.constitution-point.constitution-${id}`)
+                .attr('r', 8);
+
+            svg.selectAll(`.constitution-glow.constitution-${id}`)
+                .attr('r', 20)
+                .attr('opacity', 0.4);
+        }
+
+        function unhighlightAll() {
+            svg.selectAll('.constitution-point')
+                .attr('r', 5);
+
+            svg.selectAll('.constitution-glow')
+                .attr('r', 12)
+                .attr('opacity', 0.2);
+        }
+
+        // Initial render
+        render();
+
+        // Add default card
+        document.getElementById('persona-display').innerHTML = `
+            <div class="persona-card active" id="default-card">
+                <div class="persona-name">Select a Constitution</div>
+                <div class="persona-country">HOVER OR CLICK TO EXPLORE</div>
+                <div class="persona-motto">
+                    "Each cell in this tessellation represents a unique philosophy
+                    of governance—a vision of how power should flow between
+                    the individual and the collective."
+                </div>
+                <div class="persona-traits">
+                    <span class="trait">18 Constitutions</span>
+                    <span class="trait">200+ Years</span>
+                    <span class="trait">5 Continents</span>
+                </div>
+            </div>
+        `;
+    </script>
+</body>
+</html>
